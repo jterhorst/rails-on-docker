@@ -13,6 +13,8 @@
 
 ActiveRecord::Schema.define(version: 20140624145910) do
 
+  enable_extension "plpgsql"
+
   create_table "brands", force: true do |t|
     t.string   "name"
     t.datetime "created_at"

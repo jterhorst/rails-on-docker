@@ -1,7 +1,12 @@
 source 'https://rubygems.org'
 
-gem 'rails', '~> 4.2.0'
-gem 'mysql2'
+gem 'rails', '~> 4.2'
+# gem 'mysql2'
+
+gem 'pg', '~> 0.21.0'
+
+# pg on Mac http://www.uponmyshoulder.com/blog/2011/cant-find-the-postgresql-client-library-libpq/
+# gem install pg -v '0.21.0' -- --with-pg-config=/Applications/Postgres.app/Contents/Versions/latest/bin/pg_config
 
 gem 'sidekiq', '~> 4.0'
 gem 'sinatra', require: nil

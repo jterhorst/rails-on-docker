@@ -1,12 +1,22 @@
 version: '2'
 services:
+
+  db:
+    image: postgres:9.6
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_DB=prod
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+
   web: &app
     build: .
     environment:
       - VIRTUAL_HOST=beer.docker
       - SECRET_KEY_BASE
-      - MYSQL_USER
-      - MYSQL_PASSWORD
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
       - RAILS_ENV=production
     depends_on:
       - db
@@ -18,24 +28,18 @@ services:
     command: bundle exec sidekiq -e production -c 25
     environment:
       - SECRET_KEY_BASE
-      - MYSQL_USER
-      - MYSQL_PASSWORD
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
 
   proxy:
     image: jwilder/nginx-proxy:latest
+    environment:
+      - ENABLE_IPV6=true
     ports:
       - "80:80"
     volumes:
-      - "/var/run/docker.sock:/tmp/docker.sock"
-  db:
-    image: mariadb:10.1
-    volumes:
-      - './data:/var/lib/mysql'
-    environment:
-      - MYSQL_RANDOM_ROOT_PASSWORD=1
-      - MYSQL_DATABASE=beer_production
-      - MYSQL_USER
-      - MYSQL_PASSWORD
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
+  
   redis:
     image: redis:3.0-alpine
   cache:

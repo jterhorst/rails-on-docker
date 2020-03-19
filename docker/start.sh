@@ -1,15 +1,18 @@
 #!/bin/sh
 
 # Wait for the database
-./docker/wait-for-it.sh db:3306 --timeout=30 --strict -- echo "Database is up!"
+./docker/wait-for-postgres.sh db echo "Database is up!"
 
-export MYSQL_PWD=$MYSQL_PASSWORD
-if echo "select * from schema_migrations;" | mysql -h db -u$MYSQL_USER beer_production; then
+export POSTGRES_USER=$POSTGRES_USER
+export POSTGRES_PASSWORD=$POSTGRES_PASSWORD
+echo '*:*:*:*:$POSTGRES_PASSWORD' > ~/.pgpass
+unset $POSTGRES_PASSWORD
+
+if echo "select * from schema_migrations;" | psql -h db -U $POSTGRES_USER -d prod  ; then
   echo "Database exists. Not initializing."
 else
   echo "Initializing database..."
   bin/rake db:setup
 fi
-unset $MYSQL_PWD
 
 exec bundle exec puma -C config/puma.rb
